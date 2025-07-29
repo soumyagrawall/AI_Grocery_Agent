@@ -44,3 +44,36 @@ if __name__ == "__main__":
 
     for product in grocery_list:
         search_blinkit(product["item"])
+
+
+from playwright.sync_api import sync_playwright
+
+def search_blinkit(item_name):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto("https://blinkit.com")
+
+        page.wait_for_selector('input[type="text"]')
+        search_box = page.locator('input[type="text"]')
+        search_box.fill(item_name)
+        search_box.press('Enter')
+        page.wait_for_timeout(4000)
+
+        try:
+            product_name = page.locator('div.sc-dBaXSw.iJzfGp span').first.inner_text()
+            price = page.locator('div.sc-jrcTuL.gxMbem span').first.inner_text()
+            browser.close()
+            return {
+                "item": item_name,
+                "product_name": product_name,
+                "price": price
+            }
+        except:
+            browser.close()
+            return {
+                "item": item_name,
+                "product_name": "Not found",
+                "price": "N/A"
+            }
+
