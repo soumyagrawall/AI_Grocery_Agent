@@ -30,3 +30,38 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+from flask import Flask, render_template, request
+from blinkit_bot import search_blinkit
+
+app = Flask(__name__)
+
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    grocery_list = []
+    blinkit_results = []
+
+    if request.method == "POST":
+        note = request.form["note"]
+
+        # Dummy structured list (replace with Gemini AI later)
+        grocery_list = [
+            {"item": "milk", "quantity": "2", "brand": "Amul"},
+            {"item": "bread", "quantity": "1", "brand": "Harvest"}
+        ]
+
+        # Search Blinkit for each item
+        for item in grocery_list:
+            result = search_blinkit(item["item"])
+            blinkit_results.append(result)
+
+    return render_template("index.html", grocery_list=grocery_list, blinkit_results=blinkit_results)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+"""Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)"""
